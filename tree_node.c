@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "tree_node.h"
 
 /* TODO_ remove this instruction comment block after reading.
  * Docstrings for functions declared in a .h file belong in the .h file.

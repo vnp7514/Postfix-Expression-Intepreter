@@ -61,6 +61,11 @@ header.mak
 touch.*
 *.swp
 Makefile
+interp
+parser
+stack
+symtab
+tree_node
 
 
 # Text files #
