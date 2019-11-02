@@ -72,7 +72,10 @@ void free_stack(stack_t *stack){
 	free_stack(stack);
     }
 }
-
+#if 0 
+##########################################
+TESTING THE FUNCTIONALITIES OF THIS FILE #
+##########################################
 /// Assuming nodes have data as integer pointers
 ///
 void print_node(stack_node_t *node){
@@ -198,5 +201,5 @@ int main() {
     test();
     return EXIT_SUCCESS ;
 }
-
+#endif
 // end

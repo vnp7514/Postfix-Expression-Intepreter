@@ -6,14 +6,14 @@
 #include "tree_node.h"
 #include "stack.h"
 
-/// The types of errors that can be run into while parsing
-/// or evaluating the tree
+// The types of errors that can be run into while parsing
+// or evaluating the tree
 typedef enum parse_error_e {
-    PARSE_NONE,                 ///< no problems
-    TOO_FEW_TOKENS,             ///< not enough tokens in expression
-    TOO_MANY_TOKENS,            ///< too many tokens in expression
-    INVALID_ASSIGNMENT,         ///< assign to left hand side not a variable
-    ILLEGAL_TOKEN               ///< doesn't fit any other pattern
+    PARSE_NONE,                 // no problems
+    TOO_FEW_TOKENS,             // not enough tokens in expression
+    TOO_MANY_TOKENS,            // too many tokens in expression
+    INVALID_ASSIGNMENT,         // assign to left hand side not a variable
+    ILLEGAL_TOKEN               // doesn't fit any other pattern
 } parse_error_t;
 
 typedef enum eval_error_e {

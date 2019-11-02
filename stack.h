@@ -6,7 +6,7 @@
 #include "stack_node.h"
 
 typedef struct stack_s {
-    stack_node_t *top;             ///< linked list of stack_nodes
+    stack_node_t *top;             // linked list of stack_nodes
 } stack_t;
 
 /// make a new stack

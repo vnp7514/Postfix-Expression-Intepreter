@@ -35,6 +35,11 @@ tree_node_t *make_leaf(exp_type_t exp_type, char *token){
     tree->node = node;
     return tree;
 }
+#if 0
+######################################
+TESTING FUNCTIONALITIES OF THIS FILE #
+######################################
+
 /// Testing make_leaf() function
 ///
 void test_make_leaf(){
@@ -65,5 +70,6 @@ int main() {
     test();
     return EXIT_SUCCESS ;
 }
+#endif
 
 // end

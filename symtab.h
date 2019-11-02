@@ -5,17 +5,17 @@
 
 #define BUFLEN 1024             // input buffer length for initial symbols
 
-/// A single symbol definition
+// A single symbol definition
 typedef struct symbol_s {
-    char *var_name;             ///< the name of the symbol
-    int val;                    ///< the value currently bound to this symbol
-    struct symbol_s *next;      ///< the next item in the list
+    char *var_name;             // the name of the symbol
+    int val;                    // the value currently bound to this symbol
+    struct symbol_s *next;      // the next item in the list
 } symbol_t;
 
 /// Constructs the table by reading the file.  The format is
 /// one symbol per line in the format:
 ///
-///     variable-name     variable-value
+///     variable-type variable-name     variable-value
 ///     ...
 ///
 /// For this problem we guarantee the variable-names are all
@@ -41,11 +41,19 @@ void build_table(char *filename);
 /// Each symbol should be printed one per line, tab-indented.
 void dump_table(void);
 
-/// Returns the symbol associated with variable name
-/// @param variable The name of the variable
-/// @return The symbol_t object containing the binding, or NULL if not found
+/// Returns the symtab_t object in the symbol table associated
+///     with the variable name
+/// @param variable The name of the variable (a C string)
+/// @return The symbol_t object containing the binding,
+///     or NULL if not found
 symbol_t *lookup_table(char *variable);
 
+/// Adds a binding to the symbol table
+/// @param name  The name of the variable (a C string)
+/// @param val  The value associated with the variable
+/// @return the new symbol_t object added to the table,
+///     or NULL if no space is available
+/// No check is done to see if the symbol is already in the table
 symbol_t *create_symbol(char *name, int val);
 
 /// Destroys the symbol table
