@@ -26,6 +26,7 @@ void free_symbol_t(symbol_t *symbol){
 ///
 void free_table(){
     free_symbol_t(table); 
+    table = NULL;
 }
 
 /// from symtab.h
@@ -110,15 +111,19 @@ symbol_t *lookup_table(char *variable){
 symbol_t *create_symbol(char *name, int val){
     symbol_t *new = (symbol_t *) calloc(1, sizeof(symbol_t));
     new->var_name = (char *) calloc (BUFLEN, sizeof(char));
-    strncpy(name, new->var_name, BUFLEN);
+    strncpy(new->var_name, name, BUFLEN);
     new->val = val;
     symbol_t *current = table;
-    symbol_t *prev = NULL;
+    symbol_t *prev = table;
     while (current != NULL){
         prev = current;
         current = current->next;
     }
-    prev->next = new;
+    if (prev == NULL){
+        table = new;
+    } else {
+        prev->next = new;
+    }
     return new;
 }
 
