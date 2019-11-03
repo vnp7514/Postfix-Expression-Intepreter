@@ -36,44 +36,50 @@ void build_table(char *filename){
 	    
         FILE *file = fopen(filename, "r");
 	if (file == NULL){
-            fprintf(stderr, "Failed to open file!");
+            perror(filename);
             exit(EXIT_FAILURE);
 
         } else {
 
 	    char name[BUFLEN];
 	    char value[BUFLEN];
-	    int result;
 	    symbol_t* current = NULL;
 	    
-            while ((result = fscanf(file, "%s %s \n", name, value)) == 2){
-                //Making a new node
-                symbol_t* new = (symbol_t*) calloc(1, sizeof(symbol_t));
-	        new->var_name = (char *) calloc(BUFLEN, sizeof(char));
-                strncpy(new->var_name, name, BUFLEN);
+            while (fscanf(file, "%s %s \n", name, value) != EOF){
+                
+                if (*name != '#'){
+                    //Making a new node
+                    symbol_t* new = (symbol_t*) calloc(1, sizeof(symbol_t));
+                    new->var_name = (char *) calloc(BUFLEN, sizeof(char));
+                    strncpy(new->var_name, name, BUFLEN);
 
-		char *ptr;
-                new->val = strtol(value, &ptr, 10);
-		if (ptr == value){//not an int
-                    free(new->var_name);
-		    free(new);
-                    free_table();
-		    fprintf(stderr, 
-                       "Symbol Table text is not formatted correctly\n");
-		    exit(EXIT_FAILURE);
-		}
-                if (table == NULL){//first node
-		    table = new;
-		} else {
-		    current->next = new;
-		}
-		current = new;
-	    
-	    }
-        
+                    char *ptr;
+                    new->val = strtol(value, &ptr, 10);
+                    if (*ptr != 0){//not an int
+                        free(new->var_name);
+                        free(new);
+                        free_table();
+                        fclose(file);
+                        fprintf(stderr, 
+                        "Symbol Table text is not formatted correctly\n");
+                         exit(EXIT_FAILURE);
+                    }
+                    if (table == NULL){//first node
+                        table = new;
+                    } else {
+                        current->next = new;
+                    }
+                    current = new;
+                  }
+		else { //Comments are read from input
+                    while (getc(file) != '\n'){
+		    }
+                }
+            }
 	}
 
-	fclose( file );
+        fclose( file );
+
     }
 }
 
