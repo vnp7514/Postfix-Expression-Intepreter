@@ -1,38 +1,38 @@
 // 
-// File: touch.c 
-// TODO_DOCS_ touch.c
+// File: interp.c
+// This is the implementation of the interp.h. _TO_DO
 // @author Nguyen Dinh Van Pham <vnp7514@rit.edu>
 // // // // // // // // // // // // // // // // // // // // // // // 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "interp.h"
+#include "symtab.h"
 
-/* TODO_ remove this instruction comment block after reading.
- * Docstrings for functions declared in a .h file belong in the .h file.
- * C function docstrings appear before the function declaration.
- * Function documentation 'docstring' must be publishable.
- * The docstring should document its input parameters and return values.
- */
-
-/// TODO_ provide function purpose documentation -- its 'docstring'
-/// TODO_ if main takes no args, change to "main( void )" and remove //@params
+/// The program should runs with one optional argument. If there are
+///   more arguments, an error will be returned.
 /// @param argc  number of command line arguments, including program name
 /// @param argv  supplied command line arguments, including program name
 /// @returns errorCode  error Code; EXIT_SUCCESS if no error
 
 int main( int argc, char* argv[] ) {
 
-    // TODO_ indentation should be at least 3 spaces; 2 is not enough.
+    char *file_name = NULL;
+    if (argc > 2) {
+        fprintf(stderr, "Usage: interp [sym-table]\n");
+	exit(EXIT_FAILURE);
+    } else if (argc == 2){
+        file_name = argv[1];
+    }
+    build_table(file_name);
+    dump_table();
+    printf("Enter postfix expressions (CTRL-D to exit):\n");
+    int result;
+    while ((result = getchar()) != EOF){
+        printf("%c", result);
+    }
 
-    // TODO_ wrap code lines when they get 'long' (~80 chars). 
-    printf( "TODO_ %s received %i command line arguments.\n",
-            argv[0], argc );
-
-#if 0
-    // TODO_ how to exclude code from compilation instead of commenting out.
-#endif
-
+    
     return EXIT_SUCCESS ;
 }
 
