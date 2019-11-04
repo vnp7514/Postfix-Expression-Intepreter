@@ -68,6 +68,7 @@ symtab
 tree_node
 test
 symtab_test.c
+test_parser.c
 
 # Text files #
 ##############
