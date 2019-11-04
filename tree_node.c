@@ -39,6 +39,12 @@ tree_node_t *make_leaf(exp_type_t exp_type, char *token){
     return tree;
 }
 
+
+
+#if 0
+############################################################
+#Testing functions for tree_node to check for memory errors#
+############################################################
 void free_interior(interior_node_t *node);
 
 /// Free the tree from the dynamic memory
@@ -67,10 +73,6 @@ void free_interior(interior_node_t *node){
      }
 }
 
-#if 0
-############################################################
-#Testing functions for tree_node to check for memory errors#
-############################################################
 /// Testing make_leaf() function
 ///
 void test_make_leaf(){
