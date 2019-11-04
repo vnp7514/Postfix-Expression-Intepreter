@@ -10,16 +10,46 @@
 #include <stdbool.h>
 #include <string.h>
 
+static parse_error_t error = PARSE_NONE;
+
+void print_error(){
+    switch (error){
+        case TOO_FEW_TOKENS:
+            fprintf(stderr, "Invalid expression, not enough tokens\n");
+            break;
+         case TOO_MANY_TOKENS:
+            fprintf(stderr, "Invalid expression, too many tokens\n");
+            break;
+         case INVALID_ASSIGNMENT:
+            fprintf(stderr, "Invalid assignment\n");
+            break;
+         case ILLEGAL_TOKEN:
+            fprintf(stderr, "Illegal token\n");
+            break;
+         default:
+            break;
+ }
+}
+
 /// From parser.h
 ///
 void rep(char *exp){
+    tree_node_t *tree = make_parse_tree(exp);
+    if (error != PARSE_NONE){
+        int result = eval_tree(tree);
+	print_infix(tree);
+	printf(" = %d\n", result);
+    } else {
+        print_error();
+    }
+    cleanup_tree(tree);
 }
 
 /// Check whether the token is an operation
 /// @param token the token to be checked
 /// @return true if token is an operation, false otherwise
 ///
-bool is_op(char *token){
+bool is_op(const char *token){
     return strcmp(token, ADD_OP_STR) == 0 ||
         strcmp(token, SUB_OP_STR) == 0 ||
         strcmp(token, MUL_OP_STR) == 0 ||
@@ -33,7 +63,7 @@ bool is_op(char *token){
 /// @param token the token
 /// @return a value within the op_type_t enum
 ///
-op_type_t toOP(char* token){
+op_type_t toOP(const char* token){
     if (strcmp(token, ADD_OP_STR) == 0){
         return ADD_OP;
     } else if (strcmp(token, SUB_OP_STR) == 0){
@@ -49,33 +79,55 @@ op_type_t toOP(char* token){
     } else if (strcmp(token, Q_OP_STR) == 0){
         return Q_OP;
     } else {
-        fprintf(stderr, "Invalid operation string!\n");
+        fprintf(stderr, "Something is wrong with is_op()\n");
 	exit(EXIT_FAILURE); 
     }
+}
+
+/// Check whether the token is an alphanumeric string
+/// @param token the token
+/// @return true if token is alphanumeric. false otherwise
+bool is_alphanumeric(const char *token){
+    char *tk;
+    while ((sscanf(token, "%c", tk)) != EOF){
+        if (!((*tk >= 48 && *tk <= 57) ||//digit
+            (*tk >= 65 && *tk <= 90) ||//uppercase
+            (*tk >= 97 && *tk <= 122))){//lowercase
+            return false;
+	}
+    }
+    return true;
 }
 
 /// From parser.h
 ///
 tree_node_t *parse(stack_t *stack){
     tree_node_t* node = NULL;
-    char *token = top(stack);
-    pop(stack);
-    if (is_op(token)){
-        op_type_t op = toOP(token);
-	tree_node_t* left = parse(stack);
-	tree_node_t* right = parse(stack);
-	node = make_interior(op, token, left, right);
-    } else {
-        char *endptr;
-        strtol(token, &endptr, 10);
-        if (endptr == token){// Should be a symbol
-           node = make_leaf(SYMBOL, token);
-        } else if (*endptr != 0){//there are characters after number
-           fprintf(stderr, "BAD NUMBER in parse() in parser.c\n");
-           exit(EXIT_FAILURE);
+    if (stack != NULL){
+        char *token = top(stack);
+        pop(stack);
+        if (is_op(token)){
+           op_type_t op = toOP(token);
+	   tree_node_t* left = parse(stack);
+	   tree_node_t* right = parse(stack);
+	   node = make_interior(op, token, left, right);
         } else {
-	   node = make_leaf(INTEGER, token); 
-	}
+            char *endptr;
+            strtol(token, &endptr, 10);
+            if (endptr == token){// Should be a symbol
+                if (!is_alphanumeric(token)){
+		    error = ILLEGAL_TOKEN;
+		} else {
+                    node = make_leaf(SYMBOL, token);
+                }
+            } else if (*endptr != 0){//there are characters after number
+                error = ILLEGAL_TOKEN;
+            } else {
+                node = make_leaf(INTEGER, token); 
+	    }
+        }
+    } else {
+        error = TOO_FEW_TOKENS;
     }
     return node;
 }
@@ -83,7 +135,19 @@ tree_node_t *parse(stack_t *stack){
 /// From parser.h
 /// 
 tree_node_t *make_parse_tree(char* expr){
-    return NULL;
+    char *token;
+    stack_t* stack = make_stack();
+    while ((token = strtok(expr, " ")) != NULL){
+        push(stack, (void *) token);
+    } 
+    tree_node_t* tree = parse(stack);
+    if (!empty_stack(stack)){
+        error = TOO_MANY_TOKENS;
+    }
+        
+    free_stack(stack);
+    return tree;
+
 }
 
 /// From parser.h
@@ -131,7 +195,9 @@ void cleanup_tree(tree_node_t* node){
         if (node->type == INTERIOR){
             free_interior(node->node);
         } else {
-            free(node->node); 
+            if (node->node != NULL){	
+                free(node->node); 
+            }
         }
         free(node);
     }

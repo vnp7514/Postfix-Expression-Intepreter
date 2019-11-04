@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include "interp.h"
 #include "symtab.h"
+#include "parser.h"
+#include <string.h>
 
 /// The program should runs with one optional argument. If there are
 ///   more arguments, an error will be returned.
@@ -26,10 +28,18 @@ int main( int argc, char* argv[] ) {
     }
     build_table(file_name);
     dump_table();
-    printf("Enter postfix expressions (CTRL-D to exit):\n");
-    int result;
-    while ((result = getchar()) != EOF){
-        printf("%c", result);
+    printf("Enter postfix expressions (CTRL-D to exit):\n> ");
+    char line[MAX_LINE+1];
+    while (fgets(line, MAX_LINE+1, stdin) != NULL){
+        if (line[strlen(line) - 1] != '\n'){
+            fprintf(stderr, "Input line too long\n");
+            while(line[strlen(line) - 1] != '\n'){
+                fgets(line, MAX_LINE+1, stdin);
+	    }
+        } else {
+            printf("%s", line);
+        }
+        printf("> ");
     }
 
     
