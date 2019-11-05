@@ -54,7 +54,6 @@ int main( int argc, char* argv[] ) {
             }
             if ((int) strlen(exp) != 0){
                 rep(exp);
-                printf("\n");
             }
             free(exp);
         }

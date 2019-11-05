@@ -78,7 +78,7 @@ void rep(char *exp){
         int result = eval_tree(tree);
         if (eval_err == EVAL_NONE){
             print_infix(tree);
-            printf(" = %d", result);
+            printf(" = %d\n", result);
         } else {
             print_eval_error();
         }
@@ -309,8 +309,6 @@ int eval_tree(tree_node_t *node){
 		       tree_node_t* iffalse = node1->right;
                        return (eval_tree(left) ? eval_tree(iftrue) : eval_tree(iffalse));
                     }
-		    
-                    
                     break;
                 case NO_OP:
                     eval_err = UNKNOWN_OPERATION;
