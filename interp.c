@@ -37,7 +37,7 @@ int main( int argc, char* argv[] ) {
                 fgets(line, MAX_LINE+1, stdin);
 	    }
         } else {
-            printf("%s", line);
+            rep(line);
         }
         printf("> ");
     }

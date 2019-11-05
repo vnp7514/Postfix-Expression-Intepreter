@@ -28,14 +28,15 @@ void print_error(){
             break;
          default:
             break;
- }
+    }
+    error = PARSE_NONE;
 }
 
 /// From parser.h
 ///
 void rep(char *exp){
     tree_node_t *tree = make_parse_tree(exp);
-    if (error != PARSE_NONE){
+    if (error == PARSE_NONE){
         int result = eval_tree(tree);
 	print_infix(tree);
 	printf(" = %d\n", result);
@@ -87,47 +88,68 @@ op_type_t toOP(const char* token){
 /// Check whether the token is an alphanumeric string
 /// @param token the token
 /// @return true if token is alphanumeric. false otherwise
+///
 bool is_alphanumeric(const char *token){
-    char *tk;
-    while ((sscanf(token, "%c", tk)) != EOF){
-        if (!((*tk >= 48 && *tk <= 57) ||//digit
-            (*tk >= 65 && *tk <= 90) ||//uppercase
-            (*tk >= 97 && *tk <= 122))){//lowercase
+    for (unsigned int i = 0; i < strlen(token); i++){
+        if (!((token[i] >= 48 && token[i] <= 57) ||//digit
+            (token[i] >= 65 && token[i] <= 90) ||//uppercase
+            (token[i] >= 97 && token[i] <= 122))){//lowercase
             return false;
 	}
     }
     return true;
 }
 
+/// Check whether the node is a symbol node
+/// @param node the pointer to a tree_node_t structure
+///return true if it is a symbol, false otherwise
+///
+bool is_symbol(tree_node_t* node){
+    if (node != NULL){
+        if (node->type == LEAF){
+            if ( ( (leaf_node_t*) (node->node) ) ->exp_type == SYMBOL ){
+                return true;  
+            }
+        }
+    }
+    return false;
+}
+
 /// From parser.h
 ///
 tree_node_t *parse(stack_t *stack){
     tree_node_t* node = NULL;
-    if (stack != NULL){
-        char *token = top(stack);
-        pop(stack);
-        if (is_op(token)){
-           op_type_t op = toOP(token);
-	   tree_node_t* left = parse(stack);
-	   tree_node_t* right = parse(stack);
-	   node = make_interior(op, token, left, right);
-        } else {
-            char *endptr;
-            strtol(token, &endptr, 10);
-            if (endptr == token){// Should be a symbol
-                if (!is_alphanumeric(token)){
-		    error = ILLEGAL_TOKEN;
-		} else {
-                    node = make_leaf(SYMBOL, token);
+    if (error == PARSE_NONE){
+        if (!empty_stack(stack)){
+            char *token = top(stack);
+            pop(stack);
+            if (is_op(token)){
+                op_type_t op = toOP(token);
+                tree_node_t* right = parse(stack);
+                tree_node_t* left = parse(stack);
+                if (op == ASSIGN_OP && !is_symbol(left)){
+                    error = INVALID_ASSIGNMENT;
                 }
-            } else if (*endptr != 0){//there are characters after number
-                error = ILLEGAL_TOKEN;
+	        node = make_interior(op, token, left, right);
             } else {
-                node = make_leaf(INTEGER, token); 
-	    }
+                char *endptr;
+                strtol(token, &endptr, 10);
+                if (endptr == token){// Should be a symbol
+                    if (!is_alphanumeric(token)){
+		        error = ILLEGAL_TOKEN;
+		    } else {
+                        node = make_leaf(SYMBOL, token);
+                    }
+                    } else if (*endptr != 0){
+                    //there are characters after number
+                        error = ILLEGAL_TOKEN;
+                    } else {
+                        node = make_leaf(INTEGER, token); 
+	            }
+            }
+        } else {
+            error = TOO_FEW_TOKENS;
         }
-    } else {
-        error = TOO_FEW_TOKENS;
     }
     return node;
 }
@@ -137,11 +159,13 @@ tree_node_t *parse(stack_t *stack){
 tree_node_t *make_parse_tree(char* expr){
     char *token;
     stack_t* stack = make_stack();
-    while ((token = strtok(expr, " ")) != NULL){
+    token = strtok(expr, " ");
+    while ((token) != NULL){
         push(stack, (void *) token);
+        token = strtok(NULL, " ");
     } 
     tree_node_t* tree = parse(stack);
-    if (!empty_stack(stack)){
+    if (!empty_stack(stack) && error == PARSE_NONE){
         error = TOO_MANY_TOKENS;
     }
         
