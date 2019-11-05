@@ -168,12 +168,21 @@ tree_node_t *parse(stack_t *stack){
             pop(stack);
             if (is_op(token)){
                 op_type_t op = toOP(token);
-                tree_node_t* right = parse(stack);
-                tree_node_t* left = parse(stack);
-                if (op == ASSIGN_OP && !is_symbol(left)){
-                    error = INVALID_ASSIGNMENT;
-                }
-	        node = make_interior(op, token, left, right);
+		if (op == Q_OP){
+                    tree_node_t* iffalse = parse(stack);
+                    tree_node_t* iftrue = parse(stack);
+		    tree_node_t* test = parse(stack);
+		    tree_node_t* right 
+			    = make_interior(ALT_OP, ":", iftrue, iffalse);
+                    node = make_interior(op, token, test, right);
+		} else {
+                    tree_node_t* right = parse(stack);
+                    tree_node_t* left = parse(stack);
+                    if (op == ASSIGN_OP && !is_symbol(left)){
+                        error = INVALID_ASSIGNMENT;
+                    }
+	            node = make_interior(op, token, left, right);
+		}
             } else {
                 char *endptr;
                 strtol(token, &endptr, 10);
