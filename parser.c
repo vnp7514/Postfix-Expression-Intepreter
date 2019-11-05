@@ -43,7 +43,7 @@ void print_eval_error(){
             fprintf(stderr, "Division by zero\n");
             break;
          case INVALID_MODULUS:
-            fprintf(stderr, "Invalid modulus\n");
+            fprintf(stderr, "Division by zero\n");
             break;
          case UNDEFINED_SYMBOL:
             fprintf(stderr, "Undefined symbol\n");
@@ -52,7 +52,7 @@ void print_eval_error(){
             fprintf(stderr, "Unknown operation\n");
             break;
          case UNKNOWN_EXP_TYPE:
-            fprintf(stderr, "Unknown exp type\n");
+            fprintf(stderr, "Unknown node type\n");
             break;
          case MISSING_LVALUE:
             fprintf(stderr, "Missing lvalue\n");
@@ -61,7 +61,7 @@ void print_eval_error(){
             fprintf(stderr, "Invalid lvalue\n");
             break;
          case SYMTAB_FULL:
-            fprintf(stderr, "Symtab full\n");
+            fprintf(stderr, "No room in symbol table\n");
             break;
          default:
             break;
@@ -259,7 +259,7 @@ int eval_tree(tree_node_t *node){
                     break;
                 case DIV_OP:
 		    result = eval_tree(right);
-                    if (result == 0){
+                    if (result == 0 && eval_err == EVAL_NONE){
                         eval_err = DIVISION_BY_ZERO;
                         return -1;
                     } else {
@@ -268,7 +268,7 @@ int eval_tree(tree_node_t *node){
                     break;
                 case MOD_OP:
 		    result = eval_tree(right);
-                    if (result == 0){
+                    if (result == 0 && eval_err == EVAL_NONE){
                         eval_err = INVALID_MODULUS;
                         return -1;
                     } else {

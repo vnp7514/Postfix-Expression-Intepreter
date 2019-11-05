@@ -36,17 +36,27 @@ int main( int argc, char* argv[] ) {
             fprintf(stderr, "Input line too long\n");
             while(line[strlen(line) - 1] != '\n'){
                 fgets(line, MAX_LINE+1, stdin);
-	    }
+            }
         } else {
             char* exp = (char*) calloc(MAX_LINE, sizeof(char));
-	    strncpy(exp, line, strlen(line) -1); //excluding the '\n' character
-	    char* cmt = strchr(exp, '#');
+	    strncpy(exp, line, strlen(line)); //excluding the '\n' character
+            char* cmt = strchr(exp, '#');
+            char* endl = strchr(exp, '\n');
+            char* eof = strchr(exp, EOF);
             if (cmt != NULL){
                 *cmt = '\0';
             }
-            rep(exp);
-	    printf("\n");
-	    free(exp);
+            if (endl != NULL){
+                *endl = '\0';
+            }
+            if (eof != NULL){
+                *eof = '\0';
+            }
+            if ((int) strlen(exp) != 0){
+                rep(exp);
+                printf("\n");
+            }
+            free(exp);
         }
         printf("> ");
     }
