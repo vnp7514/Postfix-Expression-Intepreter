@@ -40,10 +40,13 @@ int main( int argc, char* argv[] ) {
             char* exp = (char*) calloc(MAX_LINE, 1);
 	    strncpy(exp, line, strlen(line) -1); //excluding the '\n' character
             rep(exp);
+	    printf("\n");
 	    free(exp);
         }
-        printf("\n> ");
+        printf("> ");
     }
+    printf("\n");
+    dump_table();
     free_table();
     
     return EXIT_SUCCESS ;
