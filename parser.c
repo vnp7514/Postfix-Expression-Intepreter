@@ -302,14 +302,20 @@ int eval_tree(tree_node_t *node){
 		    }
                     break;
                 case Q_OP:
+		    if (right->type != INTERIOR){
+		        eval_err = UNKNOWN_EXP_TYPE;
+		    } else {
+		       interior_node_t* node1 =(interior_node_t*) (right->node);
+		       tree_node_t* iftrue = node1->left;
+		       tree_node_t* iffalse = node1->right;
+                       return (eval_tree(left) ? eval_tree(iftrue) : eval_tree(iffalse));
+                    }
 		    
-                    
-                    break;
-                case ALT_OP:
                     
                     break;
                 case NO_OP:
                     eval_err = UNKNOWN_OPERATION;
+		    return -1;
                     break;
 		default:
 		    eval_err = UNKNOWN_OPERATION;
