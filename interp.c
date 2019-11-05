@@ -6,10 +6,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "interp.h"
 #include "symtab.h"
 #include "parser.h"
-#include <string.h>
+
 
 /// The program should runs with one optional argument. If there are
 ///   more arguments, an error will be returned.
@@ -27,7 +28,6 @@ int main( int argc, char* argv[] ) {
         file_name = argv[1];
     }
     build_table(file_name);
-    dump_table();
     printf("Enter postfix expressions (CTRL-D to exit):\n> ");
     char line[MAX_LINE+1];
     while (fgets(line, MAX_LINE+1, stdin) != NULL){

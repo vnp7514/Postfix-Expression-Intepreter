@@ -9,6 +9,7 @@
 #include "parser.h"
 #include <stdbool.h>
 #include <string.h>
+#include "stack.h"
 
 static parse_error_t error = PARSE_NONE;
 static eval_error_t eval_err = EVAL_NONE;
@@ -18,16 +19,16 @@ static eval_error_t eval_err = EVAL_NONE;
 void print_error(){
     switch (error){
         case TOO_FEW_TOKENS:
-            fprintf(stderr, "Invalid expression, not enough tokens\n");
+            fprintf(stderr, "Invalid expression, not enough tokens");
             break;
          case TOO_MANY_TOKENS:
-            fprintf(stderr, "Invalid expression, too many tokens\n");
+            fprintf(stderr, "Invalid expression, too many tokens");
             break;
          case INVALID_ASSIGNMENT:
-            fprintf(stderr, "Invalid assignment\n");
+            fprintf(stderr, "Invalid assignment");
             break;
          case ILLEGAL_TOKEN:
-            fprintf(stderr, "Illegal token\n");
+            fprintf(stderr, "Illegal token");
             break;
          default:
             break;
@@ -39,28 +40,28 @@ void print_error(){
 void print_eval_error(){
     switch (eval_err){
         case DIVISION_BY_ZERO:
-            fprintf(stderr, "Division by zero\n");
+            fprintf(stderr, "Division by zero");
             break;
          case INVALID_MODULUS:
-            fprintf(stderr, "Invalid modulus\n");
+            fprintf(stderr, "Invalid modulus");
             break;
          case UNDEFINED_SYMBOL:
-            fprintf(stderr, "Undefined symbol\n");
+            fprintf(stderr, "Undefined symbol");
             break;
          case UNKNOWN_OPERATION:
-            fprintf(stderr, "Unknown operation\n");
+            fprintf(stderr, "Unknown operation");
             break;
          case UNKNOWN_EXP_TYPE:
-            fprintf(stderr, "Unknown exp type\n");
+            fprintf(stderr, "Unknown exp type");
             break;
          case MISSING_LVALUE:
-            fprintf(stderr, "Missing lvalue\n");
+            fprintf(stderr, "Missing lvalue");
             break;
          case INVALID_LVALUE:
-            fprintf(stderr, "Invalid lvalue\n");
+            fprintf(stderr, "Invalid lvalue");
             break;
          case SYMTAB_FULL:
-            fprintf(stderr, "Symtab full\n");
+            fprintf(stderr, "Symtab full");
             break;
          default:
             break;
@@ -74,12 +75,10 @@ void rep(char *exp){
     tree_node_t *tree = make_parse_tree(exp);
     
     if (error == PARSE_NONE){
- 	print_infix(tree);
-       
-	int result = eval_tree(tree);
+        print_infix(tree);
+        int result = eval_tree(tree);
         if (eval_err == EVAL_NONE){
-            
-            printf(" = %d\n", result);
+            printf(" = %d", result);
         } else {
             print_eval_error();
         }

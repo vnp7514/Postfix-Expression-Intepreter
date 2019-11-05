@@ -83,17 +83,23 @@ void build_table(char *filename){
     }
 }
 
+/// Print the table from the farmost node up
+/// @param a the pointer to the symbol table
+///
+void print(symbol_t* a){
+    if (a != NULL){
+        print(a->next);
+        printf("\tName: %s, Value: %d\n", a->var_name, a->val);
+    } 
+}
+
 /// From symtab.h
 ///
 void dump_table(){
-    symbol_t *current = table;
-    if (current != NULL){
+    if (table != NULL){
         printf("SYMBOL TABLE:\n");
-        while (current != NULL){
-            printf("\tName: %s, Value: %d\n", current->var_name, current->val);
-            current = current->next;
-        }
-    }
+        print(table);
+    }    
 }
 
 /// From symtab.h
