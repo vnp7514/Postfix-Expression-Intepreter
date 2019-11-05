@@ -41,7 +41,9 @@ int main( int argc, char* argv[] ) {
             char* exp = (char*) calloc(MAX_LINE, sizeof(char));
 	    strncpy(exp, line, strlen(line) -1); //excluding the '\n' character
 	    char* cmt = strchr(exp, '#');
-	    *cmt = '\0';
+            if (cmt != NULL){
+                *cmt = '\0';
+            }
             rep(exp);
 	    printf("\n");
 	    free(exp);
