@@ -37,9 +37,12 @@ int main( int argc, char* argv[] ) {
                 fgets(line, MAX_LINE+1, stdin);
 	    }
         } else {
-            rep(line);
+            char* exp = (char*) calloc(MAX_LINE, 1);
+	    strncpy(exp, line, strlen(line) -1); //excluding the '\n' character
+            rep(exp);
+	    free(exp);
         }
-        printf("> ");
+        printf("\n> ");
     }
     free_table();
     
