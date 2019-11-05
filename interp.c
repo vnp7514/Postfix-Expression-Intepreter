@@ -28,6 +28,7 @@ int main( int argc, char* argv[] ) {
         file_name = argv[1];
     }
     build_table(file_name);
+    dump_table();
     printf("Enter postfix expressions (CTRL-D to exit):\n> ");
     char line[MAX_LINE+1];
     while (fgets(line, MAX_LINE+1, stdin) != NULL){
@@ -37,8 +38,10 @@ int main( int argc, char* argv[] ) {
                 fgets(line, MAX_LINE+1, stdin);
 	    }
         } else {
-            char* exp = (char*) calloc(MAX_LINE, 1);
+            char* exp = (char*) calloc(MAX_LINE, sizeof(char));
 	    strncpy(exp, line, strlen(line) -1); //excluding the '\n' character
+	    char* cmt = strchr(exp, '#');
+	    *cmt = '\0';
             rep(exp);
 	    printf("\n");
 	    free(exp);
