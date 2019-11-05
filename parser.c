@@ -11,7 +11,10 @@
 #include <string.h>
 
 static parse_error_t error = PARSE_NONE;
+static eval_error_t eval_err = EVAL_NONE;
 
+/// Print out the error during parsing 
+///
 void print_error(){
     switch (error){
         case TOO_FEW_TOKENS:
@@ -32,14 +35,54 @@ void print_error(){
     error = PARSE_NONE;
 }
 
+/// Print out the error during evaluating
+void print_eval_error(){
+    switch (eval_err){
+        case DIVISION_BY_ZERO:
+            fprintf(stderr, "Division by zero\n");
+            break;
+         case INVALID_MODULUS:
+            fprintf(stderr, "Invalid modulus\n");
+            break;
+         case UNDEFINED_SYMBOL:
+            fprintf(stderr, "Undefined symbol\n");
+            break;
+         case UNKNOWN_OPERATION:
+            fprintf(stderr, "Unknown operation\n");
+            break;
+         case UNKNOWN_EXP_TYPE:
+            fprintf(stderr, "Unknown exp type\n");
+            break;
+         case MISSING_LVALUE:
+            fprintf(stderr, "Missing lvalue\n");
+            break;
+         case INVALID_LVALUE:
+            fprintf(stderr, "Invalid lvalue\n");
+            break;
+         case SYMTAB_FULL:
+            fprintf(stderr, "Symtab full\n");
+            break;
+         default:
+            break;
+    }
+    eval_err = EVAL_NONE;
+}
+
 /// From parser.h
 ///
 void rep(char *exp){
     tree_node_t *tree = make_parse_tree(exp);
+    
     if (error == PARSE_NONE){
-        int result = eval_tree(tree);
-	print_infix(tree);
-	printf(" = %d\n", result);
+ 	print_infix(tree);
+       
+	int result = eval_tree(tree);
+        if (eval_err == EVAL_NONE){
+            
+            printf(" = %d\n", result);
+        } else {
+            print_eval_error();
+        }
     } else {
         print_error();
     }
@@ -177,6 +220,96 @@ tree_node_t *make_parse_tree(char* expr){
 /// From parser.h
 ///
 int eval_tree(tree_node_t *node){
+    if (eval_err == EVAL_NONE){
+        if (node->type == LEAF){
+            if (( (leaf_node_t*) node->node )->exp_type == INTEGER){
+                char *endptr;
+                return strtol(node->token, &endptr, 10);
+            } else {
+                symbol_t* symbol = lookup_table(node->token);
+                if (symbol == NULL){
+                    eval_err = UNDEFINED_SYMBOL;
+		    return -1;
+                } else {
+                    return symbol->val;
+                }
+            }
+        } else {
+            interior_node_t* new = (interior_node_t*) node->node;
+            tree_node_t* left = new->left;
+            tree_node_t* right = new->right;
+	    int result;
+            switch(new->op){
+                case ADD_OP:
+                    return eval_tree(left) + eval_tree(right);
+                    break;
+                case SUB_OP:
+                    return eval_tree(left) - eval_tree(right);
+                    break;
+                case MUL_OP:
+                    return eval_tree(left) * eval_tree(right);
+                    break;
+                case DIV_OP:
+		    result = eval_tree(right);
+                    if (result == 0){
+                        eval_err = DIVISION_BY_ZERO;
+                        return -1;
+                    } else {
+                        return eval_tree(left) / result;
+                    }
+                    break;
+                case MOD_OP:
+		    result = eval_tree(right);
+                    if (result == 0){
+                        eval_err = INVALID_MODULUS;
+                        return -1;
+                    } else {
+                        return eval_tree(left) % result;
+                    }
+                    break;
+                case ASSIGN_OP:
+		    if (left == NULL){
+		        eval_err = MISSING_LVALUE;
+			return -1;
+		    }else if (!is_symbol(left)){
+                        eval_err = INVALID_LVALUE;
+			return -1;
+		    } else{
+                        symbol_t *symbol = lookup_table(left->token);
+			result = eval_tree(right);
+			if (symbol == NULL){
+                            
+			    if (eval_err == EVAL_NONE){
+			        symbol = create_symbol(left->token, result); 
+				if (symbol == NULL){
+				    eval_err = SYMTAB_FULL;
+				    return -1;
+				}
+			    }
+			} else {
+			    symbol->val = result;
+			}
+			return result;
+		    }
+                    break;
+                case Q_OP:
+		    
+                    
+                    break;
+                case ALT_OP:
+                    
+                    break;
+                case NO_OP:
+                    eval_err = UNKNOWN_OPERATION;
+                    break;
+		default:
+		    eval_err = UNKNOWN_OPERATION;
+		    return -1;
+		    break;
+
+            }
+        }
+    }
     return 0;
 }
 

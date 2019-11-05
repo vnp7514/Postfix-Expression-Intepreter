@@ -41,7 +41,7 @@ int main( int argc, char* argv[] ) {
         }
         printf("> ");
     }
-
+    free_table();
     
     return EXIT_SUCCESS ;
 }
